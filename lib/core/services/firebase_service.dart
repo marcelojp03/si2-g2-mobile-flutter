@@ -7,7 +7,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
-import '../config/firebase_options.dart';
+import '../../firebase_options.dart';
 
 /// Manejador de mensajes en segundo plano (debe ser función top-level)
 @pragma('vm:entry-point')
@@ -42,7 +42,9 @@ class FirebaseService {
 
     // Manejadores de mensajes en primer plano
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint('[FCM Foreground] ${message.notification?.title}: ${message.notification?.body}');
+      debugPrint(
+        '[FCM Foreground] ${message.notification?.title}: ${message.notification?.body}',
+      );
       // TODO Sprint 3: mostrar SnackBar / banner in-app
     });
 

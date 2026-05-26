@@ -12,7 +12,8 @@ class ApiService {
   // Cambia a la URL del App Runner en producción
   static const String _baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://10.0.2.2:2026', // 10.0.2.2 = localhost desde emulador Android
+    defaultValue:
+        'http://10.0.2.2:2026', // 10.0.2.2 = localhost desde emulador Android
   );
 
   static const _storage = FlutterSecureStorage();
@@ -68,10 +69,7 @@ class ApiService {
 
   Future<http.Response> get(String path) async {
     final jwt = await getToken();
-    return http.get(
-      Uri.parse('$_baseUrl$path'),
-      headers: _headers(jwt),
-    );
+    return http.get(Uri.parse('$_baseUrl$path'), headers: _headers(jwt));
   }
 
   Future<http.Response> post(String path, Map<String, dynamic> body) async {
@@ -84,7 +82,7 @@ class ApiService {
   }
 
   Map<String, String> _headers(String? jwt) => {
-        'Content-Type': 'application/json',
-        if (jwt != null) 'Authorization': 'Bearer $jwt',
-      };
+    'Content-Type': 'application/json',
+    if (jwt != null) 'Authorization': 'Bearer $jwt',
+  };
 }
