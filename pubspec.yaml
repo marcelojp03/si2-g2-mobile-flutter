@@ -29,6 +29,12 @@ dependencies:
   # UI
   google_fonts: ^6.2.1
 
+  # Navigation
+  go_router: ^14.8.1
+
+  # State management
+  provider: ^6.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

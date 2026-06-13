@@ -1,29 +1,17 @@
-// lib/core/services/api_service.dart
-//
-// Servicio HTTP base para comunicación con el backend Spring Boot.
-// Maneja JWT Bearer token, multi-tenant y registro de FCM token.
-
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import '../config/api_config.dart';
 
 class ApiService {
-  // Cambia a la URL del App Runner en producción
-  static const String _baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue:
-        'http://10.0.2.2:2026', // 10.0.2.2 = localhost desde emulador Android
-  );
-
   static const _storage = FlutterSecureStorage();
   static const _tokenKey = 'jwt_token';
-
-  // ── Auth ────────────────────────────────────────────────────────────────────
+  static const _userKey = 'user_data';
 
   Future<Map<String, dynamic>> login(String correo, String contrasena) async {
     final response = await http.post(
-      Uri.parse('$_baseUrl/api/auth/login'),
+      Uri.parse('${ApiConfig.baseUrl}${ApiConfig.login}'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'correo': correo, 'contrasena': contrasena}),
     );
@@ -35,50 +23,52 @@ class ApiService {
     return data;
   }
 
-  Future<void> logout() => _storage.delete(key: _tokenKey);
+  Future<void> saveUser(Map<String, dynamic> userData) async {
+    await _storage.write(key: _userKey, value: jsonEncode(userData));
+  }
+
+  Future<Map<String, dynamic>?> getUser() async {
+    final data = await _storage.read(key: _userKey);
+    if (data == null) return null;
+    return jsonDecode(data) as Map<String, dynamic>;
+  }
+
+  Future<void> logout() async {
+    await _storage.delete(key: _tokenKey);
+    await _storage.delete(key: _userKey);
+  }
 
   Future<String?> getToken() => _storage.read(key: _tokenKey);
 
-  // ── FCM Token ───────────────────────────────────────────────────────────────
-
-  /// Registra o actualiza el FCM token del dispositivo en el backend.
   Future<bool> registrarFcmToken(String fcmToken) async {
     final jwt = await getToken();
     if (jwt == null) return false;
-
     try {
       final response = await http.post(
-        Uri.parse('$_baseUrl/api/notificaciones/fcm-token'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $jwt',
-        },
-        body: jsonEncode({
-          'fcmToken': fcmToken,
-          'plataforma': defaultTargetPlatform.name.toLowerCase(),
-        }),
+        Uri.parse('${ApiConfig.baseUrl}/api/notificaciones/fcm-token'),
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $jwt'},
+        body: jsonEncode({'fcmToken': fcmToken, 'plataforma': 'android'}),
       );
       return response.statusCode == 200;
     } catch (e) {
-      debugPrint('[ApiService] Error registrando FCM token: $e');
+      debugPrint('[ApiService] Error registrando FCM: $e');
       return false;
     }
   }
 
-  // ── HTTP Helper ─────────────────────────────────────────────────────────────
-
   Future<http.Response> get(String path) async {
     final jwt = await getToken();
-    return http.get(Uri.parse('$_baseUrl$path'), headers: _headers(jwt));
+    return http.get(Uri.parse('${ApiConfig.baseUrl}$path'), headers: _headers(jwt));
   }
 
   Future<http.Response> post(String path, Map<String, dynamic> body) async {
     final jwt = await getToken();
-    return http.post(
-      Uri.parse('$_baseUrl$path'),
-      headers: _headers(jwt),
-      body: jsonEncode(body),
-    );
+    return http.post(Uri.parse('${ApiConfig.baseUrl}$path'), headers: _headers(jwt), body: jsonEncode(body));
+  }
+
+  Future<http.Response> put(String path, Map<String, dynamic> body) async {
+    final jwt = await getToken();
+    return http.put(Uri.parse('${ApiConfig.baseUrl}$path'), headers: _headers(jwt), body: jsonEncode(body));
   }
 
   Map<String, String> _headers(String? jwt) => {
