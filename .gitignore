@@ -49,3 +49,6 @@ google-services.json
 GoogleService-Info.plist
 lib/core/config/firebase_options.dart
 lib/firebase_options.dart
+
+# Environment
+.env
