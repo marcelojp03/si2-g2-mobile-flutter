@@ -44,7 +44,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ]),
       body: ListView(padding: const EdgeInsets.all(16), children: [
         Card(child: ListTile(
-          leading: CircleAvatar(child: Text((u?.nombres ?? 'U')[0])),
+          leading: CircleAvatar(child: Text((u != null && u.nombres.isNotEmpty ? u.nombres[0] : 'U'))),
           title: Text(u?.nombreCompleto ?? 'Usuario'),
           subtitle: Text(u?.correo ?? ''),
         )),

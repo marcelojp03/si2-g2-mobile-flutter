@@ -16,7 +16,7 @@ class AuthState {
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _repo;
   final StorageService _storage;
-  AuthNotifier(this._repo, this._storage) : super(AuthState(loading: true));
+  AuthNotifier(this._repo, this._storage) : super(AuthState(loading: false));
 
   Future<void> tryAutoLogin() async {
     final token = await _storage.getToken();
