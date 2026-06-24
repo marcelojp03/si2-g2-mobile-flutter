@@ -26,4 +26,14 @@ class CuotasRepository {
     final data = resp['data'] as List<dynamic>? ?? [];
     return data.map((e) => PagoModel.fromJson(e as Map<String, dynamic>)).toList();
   }
+
+  Future<Map<String, dynamic>> generarQr(String idCuota) async {
+    final resp = await _api.post('/cuotas/$idCuota/generar-qr');
+    return resp['data'] as Map<String, dynamic>;
+  }
+
+  Future<Map<String, dynamic>> consultarEstado(String idPago) async {
+    final resp = await _api.get('/cuotas/pago/$idPago/estado');
+    return resp['data'] as Map<String, dynamic>;
+  }
 }
