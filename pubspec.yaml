@@ -50,6 +50,9 @@ dependencies:
   # UI feedback
   another_flushbar: ^1.12.30
 
+  # Local notifications (foreground FCM display)
+  flutter_local_notifications: ^18.0.0
+
   # Environment
   flutter_dotenv: ^5.2.1
 

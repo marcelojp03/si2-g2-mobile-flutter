@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../storage/storage_service.dart';
 import '../errors/app_exception.dart';
@@ -27,12 +28,18 @@ class ApiClient {
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
         }
+        print('[API] ${options.method} ${options.uri}');
         handler.next(options);
       },
+      onResponse: (resp, handler) {
+        print('[API] ${resp.statusCode} ${resp.requestOptions.uri}');
+        handler.next(resp);
+      },
       onError: (error, handler) async {
+        print('[API ERROR] ${error.type} ${error.message}');
+        print('[API ERROR] ${error.response?.statusCode} ${error.response?.data}');
         if (error.response?.statusCode == 401) {
           await _storage.clearAll();
-          // El authProvider detectará que no hay token y redirigirá al login
         }
         handler.next(error);
       },

@@ -5,12 +5,22 @@ import 'config/theme/app_theme.dart';
 import 'config/theme/theme_provider.dart';
 import 'config/router/app_router.dart';
 import 'core/http/api_client.dart';
+import 'core/fcm/fcm_service.dart';
+import 'features/auth/providers/auth_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
   ApiClient().init();
-  runApp(const ProviderScope(child: SiaApp()));
+  await FcmService().init();
+
+  final container = ProviderContainer();
+  await container.read(authProvider.notifier).tryAutoLogin();
+
+  runApp(UncontrolledProviderScope(
+    container: container,
+    child: const SiaApp(),
+  ));
 }
 
 class SiaApp extends ConsumerWidget {
@@ -27,6 +37,11 @@ class SiaApp extends ConsumerWidget {
       darkTheme: AppTheme.darkTheme(),
       themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
       routerConfig: router,
+      builder: (context, child) => GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: child,
+      ),
     );
   }
 }

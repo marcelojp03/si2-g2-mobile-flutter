@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
+import '../../../shared/widgets/app_button.dart';
+import '../../../shared/widgets/glass_card.dart';
+import '../../../config/theme/app_theme.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -10,16 +13,31 @@ class LoginScreen extends ConsumerStatefulWidget {
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen>
+    with SingleTickerProviderStateMixin {
   final _correoCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _obscurePass = true;
+  late AnimationController _animCtrl;
+  late Animation<double> _fadeAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _animCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fadeAnim = CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutCubic);
+    _animCtrl.forward();
+  }
 
   @override
   void dispose() {
     _correoCtrl.dispose();
     _passCtrl.dispose();
+    _animCtrl.dispose();
     super.dispose();
   }
 
@@ -36,58 +54,140 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
     return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.school, size: 80, color: Theme.of(context).colorScheme.primary),
-                const SizedBox(height: 16),
-                Text('SIA - UAGRM', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                Text('Sistema de Gestion Academica', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey)),
-                const SizedBox(height: 48),
-                TextFormField(
-                  controller: _correoCtrl,
-                  decoration: const InputDecoration(labelText: 'Correo electronico', prefixIcon: Icon(Icons.email_outlined), border: OutlineInputBorder()),
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Ingrese su correo' : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _passCtrl,
-                  obscureText: _obscurePass,
-                  decoration: InputDecoration(
-                    labelText: 'Contrasena',
-                    prefixIcon: const Icon(Icons.lock_outlined),
-                    border: const OutlineInputBorder(),
-                    suffixIcon: IconButton(
-                      icon: Icon(_obscurePass ? Icons.visibility_off : Icons.visibility),
-                      onPressed: () => setState(() => _obscurePass = !_obscurePass),
-                    ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Theme.of(context).colorScheme.primary,
+              Theme.of(context).colorScheme.primary.withValues(alpha: 0.85),
+              AppTheme.scaffoldBg,
+            ],
+            stops: const [0.0, 0.4, 1.0],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: FadeTransition(
+                opacity: _fadeAnim,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(height: 40),
+                      Container(
+                        width: 88, height: 88,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
+                              blurRadius: 24,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Icon(Icons.school_rounded,
+                          size: 48,
+                          color: Theme.of(context).colorScheme.primary),
+                      ),
+                      const SizedBox(height: 20),
+                      Text('SIA - UAGRM',
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        )),
+                      const SizedBox(height: 6),
+                      Text('Sistema de Gestion Academica',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 15,
+                        )),
+                      const SizedBox(height: 48),
+                      GlassCard(
+                        margin: EdgeInsets.zero,
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              controller: _correoCtrl,
+                              decoration: const InputDecoration(
+                                labelText: 'Correo electronico',
+                                prefixIcon: Icon(Icons.email_outlined),
+                                border: OutlineInputBorder(),
+                                filled: true,
+                              ),
+                              keyboardType: TextInputType.emailAddress,
+                              textInputAction: TextInputAction.next,
+                              validator: (v) => (v == null || v.trim().isEmpty)
+                                  ? 'Ingrese su correo' : null,
+                            ),
+                            const SizedBox(height: 16),
+                            TextFormField(
+                              controller: _passCtrl,
+                              obscureText: _obscurePass,
+                              decoration: InputDecoration(
+                                labelText: 'Contrasena',
+                                prefixIcon: const Icon(Icons.lock_outlined),
+                                border: const OutlineInputBorder(),
+                                filled: true,
+                                suffixIcon: IconButton(
+                                  icon: Icon(_obscurePass
+                                      ? Icons.visibility_off
+                                      : Icons.visibility),
+                                  onPressed: () => setState(
+                                      () => _obscurePass = !_obscurePass),
+                                ),
+                              ),
+                              validator: (v) =>
+                                  (v == null || v.isEmpty)
+                                      ? 'Ingrese su contrasena' : null,
+                              onFieldSubmitted: (_) => _login(),
+                            ),
+                            const SizedBox(height: 24),
+                            AppButton(
+                              label: 'Iniciar sesion',
+                              loading: auth.loading,
+                              onPressed: _login,
+                              icon: Icons.login_rounded,
+                            ),
+                            if (auth.error != null) ...[
+                              const SizedBox(height: 16),
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.errorContainer,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.error_outline,
+                                      size: 20, color: Theme.of(context).colorScheme.error),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(auth.error!,
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.onErrorContainer,
+                                          fontSize: 13,
+                                        )),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                    ],
                   ),
-                  validator: (v) => (v == null || v.isEmpty) ? 'Ingrese su contrasena' : null,
-                  onFieldSubmitted: (_) => _login(),
                 ),
-                const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: FilledButton(
-                    onPressed: auth.loading ? null : _login,
-                    child: auth.loading
-                        ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Text('Iniciar sesion', style: TextStyle(fontSize: 16)),
-                  ),
-                ),
-                if (auth.error != null) ...[
-                  const SizedBox(height: 16),
-                  Text(auth.error!, style: TextStyle(color: Theme.of(context).colorScheme.error), textAlign: TextAlign.center),
-                ],
-              ],
+              ),
             ),
           ),
         ),

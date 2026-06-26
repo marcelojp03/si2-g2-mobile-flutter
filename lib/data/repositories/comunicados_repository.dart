@@ -7,6 +7,8 @@ class ComunicadosRepository {
 
   Future<List<Map<String, dynamic>>> getPublicados() async {
     final resp = await _api.get('/comunicados/publicados');
-    return (resp['data'] ?? []) as List<Map<String, dynamic>>;
+    final list = resp['data'];
+    if (list is! List) return [];
+    return list.cast<Map<String, dynamic>>();
   }
 }
