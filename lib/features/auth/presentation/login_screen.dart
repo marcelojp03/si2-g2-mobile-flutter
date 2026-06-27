@@ -79,22 +79,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const SizedBox(height: 40),
-                      Container(
+                      Image.asset('assets/sia-logo.png',
                         width: 88, height: 88,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
-                              blurRadius: 24,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: Icon(Icons.school_rounded,
-                          size: 48,
-                          color: Theme.of(context).colorScheme.primary),
+                        fit: BoxFit.contain,
                       ),
                       const SizedBox(height: 20),
                       Text('SIA - UAGRM',

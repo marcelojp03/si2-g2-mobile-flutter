@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="si2_g2_mobile"
+        android:label="SIA"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
