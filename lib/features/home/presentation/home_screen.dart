@@ -6,6 +6,7 @@ import '../../../data/repositories/cuotas_repository.dart';
 import '../../../data/repositories/comunicados_repository.dart';
 import '../../../data/models/comunicado_model.dart';
 import '../../../data/models/cuota_model.dart';
+import '../../../data/models/user_model.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../../config/theme/theme_provider.dart';
 import '../../../shared/widgets/glass_card.dart';
@@ -103,7 +104,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _profileCard(dynamic u) {
+  Widget _profileCard(UserModel? u) {
     final theme = Theme.of(context);
     final initials = u != null && u.nombres.isNotEmpty
         ? u.nombres.split(' ').where((s) => s.isNotEmpty).map((s) => s[0]).take(2).join().toUpperCase()
