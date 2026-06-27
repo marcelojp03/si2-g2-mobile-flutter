@@ -498,9 +498,9 @@ class _CuotasScreenState extends ConsumerState<CuotasScreen>
     try {
       final bytes = base64Decode(base64);
       return Container(
-        width: 220,
-        height: 220,
-        padding: const EdgeInsets.all(16),
+        width: 280,
+        height: 280,
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
@@ -520,8 +520,8 @@ class _CuotasScreenState extends ConsumerState<CuotasScreen>
       );
     } catch (_) {
       return Container(
-        width: 220,
-        height: 220,
+        width: 280,
+        height: 280,
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(16),

@@ -80,7 +80,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                     children: [
                       const SizedBox(height: 40),
                       Image.asset('assets/sia-logo.png',
-                        width: 88, height: 88,
+                        width: 128, height: 128,
                         fit: BoxFit.contain,
                       ),
                       const SizedBox(height: 20),
